@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>From PM to Oiler — Christopher Romanyk</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #ffffff;
+      --text-prim: #111827;
+      --text-sec:  #6b7280;
+      --accent:    #2563eb;
+      --border:    #e5e7eb;
+      --max-w:     680px;
+      --pad-x:     24px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text-prim);
+      line-height: 1.6;
+    }
+
+    /* NAV */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    nav {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 40px;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-prim);
+      text-decoration: none;
+    }
+    .nav-back {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-sec);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s;
+    }
+    .nav-back:hover { color: var(--text-prim); }
+
+    /* POST */
+    .post-wrap {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 72px var(--pad-x) 120px;
+    }
+
+    .post-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .post-category {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .post-date {
+      font-size: 13px;
+      color: var(--text-sec);
+    }
+    .post-sep { color: var(--border); }
+
+    .post-title {
+      font-size: 40px;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.5px;
+      margin-bottom: 40px;
+    }
+
+    .post-body p {
+      font-size: 17px;
+      color: var(--text-sec);
+      line-height: 1.8;
+      margin-bottom: 24px;
+    }
+    .post-body p:last-child { margin-bottom: 0; }
+
+    .post-body em {
+      color: var(--text-prim);
+      font-style: italic;
+    }
+
+    .post-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 48px 0;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      height: 72px;
+      display: flex;
+      align-items: center;
+    }
+    .footer-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 40px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    footer span { font-size: 13px; color: var(--text-sec); }
+
+    @media (max-width: 600px) {
+      .post-title { font-size: 28px; }
+      .post-body p { font-size: 16px; }
+      nav { padding: 0 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <nav>
+      <a class="nav-logo" href="/">Christopher Romanyk</a>
+      <a class="nav-back" href="/#blog">← Back to Blog</a>
+    </nav>
+  </header>
+
+  <main class="post-wrap">
+
+    <div class="post-meta">
+      <span class="post-category">Career</span>
+      <span class="post-sep">·</span>
+      <span class="post-date">March 2025</span>
+    </div>
+
+    <h1 class="post-title">From PM to Oiler: What I Learned Crossing Industries and Oceans</h1>
+
+    <div class="post-body">
+
+      <p>In 2026, abandoning a tech career for a trade is very much the fashionable thing to do. The logic goes that robotics are further from meaningful industrial automation than, say, jobs done from a laptop — so trades are the safer bet. I'd argue it's a short-sighted one. The average trade takes a few years to reach journeyman status, and if the last few years have taught us anything, a lot can happen in a few years.</p>
+
+      <p>For me though, this had nothing to do with the AI apocalypse and everything to do with freedom and a mild existential crisis.</p>
+
+      <div class="post-divider"></div>
+
+      <p>In early 2024, I was at my third FAANG, pulling a very comfortable six-figure TC, and had been fully remote for eight years. By every metric I'd set for myself at 22, I'd made it. So naturally, something had to break.</p>
+
+      <p>I was in a cute Airbnb in Poros, Greece. 11PM local. 17 degrees. Ninety-four meters away, a very enthusiastic solstice party was happening without me — because I was on my fifth call of the day. Three people. A project with "unicorn potential" that would almost certainly never ship. Standard stuff. Then a frequent collaborator joined and announced himself: <em>"Hello, this is John Doe."</em></p>
+
+      <p>He did this on every call. Including one-on-ones. Meet tells you. The app announces it. His face is on the screen. He announces it anyway.</p>
+
+      <p>Something snapped.</p>
+
+      <p>Two minutes in, a deep wave of <em>absolutely not</em> washed over me. By minute five I was mentally drafting my resignation. By the end of the call I was looking at flights to extend my stay in Greece.</p>
+
+      <div class="post-divider"></div>
+
+      <p>I planned to bring it up at my regular Monday one-on-one. Then, at 3:45PM PST that Friday, I got a calendar invite from my manager and someone from People Ops for 4:30PM — that day.</p>
+
+      <p>On the call: I was being offered a promotion. In-person. Managerial. My current role was being eliminated as part of a restructure. I could move into the new role or explore other internal options. Then People Ops outlined an exit package: six months salary, a year of benefits, and full vesting of all outstanding restricted units. All in, it was nearly four years of total comp to simply walk away.</p>
+
+      <p>The room expected me to take the promotion. My energy was positive — for very different reasons.</p>
+
+      <p>When they asked if I had any questions, I had one: <em>"Are you happy?"</em></p>
+
+      <p>They seemed mildly thrown off. Gave pleasant non-answers.</p>
+
+      <p><em>"I don't think I am anymore,"</em> I said. <em>"I'll take the exit package."</em></p>
+
+      <p>Thirty days later I was back in the US, doing exit interviews, returning six devices, and starting over completely.</p>
+
+    </div>
+
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <span>© 2025 Christopher Romanyk. All rights reserved.</span>
+      <span>St. John's, NL</span>
+    </div>
+  </footer>
+
+</body>
+</html>
