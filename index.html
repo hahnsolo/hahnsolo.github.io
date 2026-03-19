@@ -78,19 +78,36 @@
       margin: 0 auto;
       padding: 0 var(--pad-x);
     }
-    .section-heading {
-      font-size: 32px;
+    .section-header {
+      margin-bottom: 52px;
+    }
+    .section-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
       font-weight: 700;
-      color: var(--text-prim);
-      margin-bottom: 12px;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      background: rgba(37,99,235,0.08);
+      padding: 4px 12px;
+      border-radius: 9999px;
+      margin-bottom: 14px;
     }
-    .heading-bar {
-      width: 80px;
-      height: 3px;
-      background: var(--accent);
-      border-radius: 2px;
-      margin-bottom: 48px;
+    .section-heading {
+      font-size: 40px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      line-height: 1.15;
+      background: linear-gradient(135deg, var(--text-prim) 40%, #4b7bec 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0;
     }
+    /* keep old .heading-bar hidden for any legacy use */
+    .heading-bar { display: none; }
 
     /* ── HERO ── */
     #hero {
@@ -416,8 +433,10 @@
   <!-- ABOUT -->
   <section id="about">
     <div class="inner">
-      <h2 class="section-heading">About</h2>
-      <div class="heading-bar"></div>
+      <div class="section-header">
+        <div class="section-label">&#9670; About</div>
+        <h2 class="section-heading">Who I Am</h2>
+      </div>
       <div class="about-grid">
         <p class="about-bio">A strategic technical leader with a rare combination of software product management experience and hands-on marine mechanical expertise. Background spans consumer products, fintech, sports tech, and maritime systems — with a consistent focus on cross-functional leadership and operational rigour.</p>
         <div>
@@ -440,8 +459,10 @@
   <!-- BLOG -->
   <section id="blog">
     <div class="inner">
-      <h2 class="section-heading">Blog</h2>
-      <div class="heading-bar"></div>
+      <div class="section-header">
+        <div class="section-label">&#9670; Writing</div>
+        <h2 class="section-heading">Blog</h2>
+      </div>
       <div class="cards">
 
         <article class="blog-card">
@@ -468,8 +489,10 @@
   <!-- EXPERIENCE -->
   <section id="experience">
     <div class="inner">
-      <h2 class="section-heading">Experience</h2>
-      <div class="heading-bar"></div>
+      <div class="section-header">
+        <div class="section-label">&#9670; Work History</div>
+        <h2 class="section-heading">Experience</h2>
+      </div>
       <div class="cards">
 
         <article class="card">
@@ -507,8 +530,10 @@
   <!-- CONTACT -->
   <section id="contact">
     <div class="inner">
-      <h2 class="section-heading">Get in Touch</h2>
-      <div class="heading-bar"></div>
+      <div class="section-header">
+        <div class="section-label">&#9670; Let's Talk</div>
+        <h2 class="section-heading">Get in Touch</h2>
+      </div>
       <p class="contact-sub">Open to new opportunities and interesting projects. Feel free to reach out.</p>
       <div class="contact-links">
         <a href="mailto:chris@hahnsolo.ca">chris@hahnsolo.ca</a>
