@@ -1,0 +1,8 @@
+{
+  "name": "Resume Landing Page Generator",
+  "id": "resume-landing-page-001",
+  "api": "1.0.0",
+  "editorType": ["figma"],
+  "main": "code.js",
+  "documentAccess": "dynamic-page"
+}
