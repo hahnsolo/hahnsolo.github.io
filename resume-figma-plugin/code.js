@@ -355,51 +355,6 @@
 
   // ─── BLOG ─────────────────────────────────────────────────────────────────
 
-  function buildBlogCard(post, cardWidth) {
-    const card = makeFrame('Blog Card — ' + post.title.slice(0, 20), cardWidth, 'VERTICAL', {
-      primaryAxis: 'AUTO',
-      counterAxis: 'FIXED',
-      pt: 28, pb: 28, pl: 28, pr: 28,
-      gap: 12,
-      fills: solidFill(COLOR.bg),
-      cornerRadius: 12,
-    });
-    card.strokes = [{ type: 'SOLID', color: { r: 229/255, g: 231/255, b: 235/255 } }];
-    card.strokeWeight = 1;
-    card.strokeAlign = 'INSIDE';
-
-    // Category chip
-    const chip = makeFrame('Category', 0, 'HORIZONTAL', {
-      primaryAxis: 'AUTO', counterAxis: 'AUTO',
-      pl: 10, pr: 10, pt: 4, pb: 4,
-      fills: solidFill('#EFF6FF'),
-      cornerRadius: 9999,
-      crossAlign: 'CENTER',
-    });
-    chip.appendChild(makeText(post.category, 'SemiBold', 12, COLOR.accent));
-    card.appendChild(chip);
-
-    // Title
-    card.appendChild(makeText(post.title, 'Bold', 17, COLOR.textPrim, {
-      width: cardWidth - 56,
-      lineHeight: 26,
-    }));
-
-    // Divider
-    card.appendChild(makeRect(cardWidth - 56, 1, COLOR.border));
-
-    // Excerpt
-    card.appendChild(makeText(post.excerpt, 'Regular', 14, COLOR.textSec, {
-      width: cardWidth - 56,
-      lineHeight: 22,
-    }));
-
-    // Date
-    card.appendChild(makeText(post.date, 'Regular', 13, COLOR.textSec));
-
-    return card;
-  }
-
   function buildBlog(parent) {
     const section = makeFrame('Blog', 1440, 'VERTICAL', {
       fills: solidFill(COLOR.bg),
@@ -415,18 +370,35 @@
     headDivider.cornerRadius = 2;
     section.appendChild(headDivider);
 
-    const cardWidth = Math.floor((1280 - 40) / 3); // 3 cards, 2 gaps of 20
-    const row = makeFrame('Blog Cards', 1280, 'HORIZONTAL', {
+    const cardsCol = makeFrame('Blog Cards', 1280, 'VERTICAL', {
       primaryAxis: 'AUTO',
-      counterAxis: 'AUTO',
-      gap: 20,
+      counterAxis: 'FIXED',
+      gap: 24,
     });
 
-    CONTENT.blog.forEach(post => {
-      row.appendChild(buildBlogCard(post, cardWidth));
+    CONTENT.blog.forEach(function(post) {
+      const card = makeFrame('Blog Card', 1280, 'VERTICAL', {
+        primaryAxis: 'AUTO',
+        counterAxis: 'FIXED',
+        pt: 32, pb: 32, pl: 32, pr: 32,
+        gap: 12,
+        fills: solidFill(COLOR.bg),
+        cornerRadius: 12,
+      });
+      card.strokes = [{ type: 'SOLID', color: { r: 229/255, g: 231/255, b: 235/255 } }];
+      card.strokeWeight = 1;
+      card.strokeAlign = 'INSIDE';
+
+      card.appendChild(makeText(post.category, 'SemiBold', 13, COLOR.accent));
+      card.appendChild(makeText(post.title, 'Bold', 18, COLOR.textPrim, { width: 1216, lineHeight: 28 }));
+      card.appendChild(makeRect(1216, 1, COLOR.border));
+      card.appendChild(makeText(post.excerpt, 'Regular', 15, COLOR.textSec, { width: 1216, lineHeight: 24 }));
+      card.appendChild(makeText(post.date, 'Regular', 13, COLOR.textSec));
+
+      cardsCol.appendChild(card);
     });
 
-    section.appendChild(row);
+    section.appendChild(cardsCol);
     appendSection(parent, section);
   }
 
