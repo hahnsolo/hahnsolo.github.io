@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Christopher Romanyk</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #ffffff;
+      --text-prim:  #111827;
+      --text-sec:   #6b7280;
+      --accent:     #2563eb;
+      --border:     #e5e7eb;
+      --chip-bg:    #f3f4f6;
+      --contact-bg: #f9fafb;
+      --max-w:      1280px;
+      --pad-x:      80px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text-prim);
+      line-height: 1.6;
+    }
+
+    /* ── NAV ── */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    nav {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 var(--pad-x);
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-prim);
+      text-decoration: none;
+    }
+    .nav-links {
+      display: flex;
+      gap: 36px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 15px;
+      color: var(--text-sec);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text-prim); }
+
+    /* ── SECTIONS ── */
+    section {
+      width: 100%;
+    }
+    .inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 var(--pad-x);
+    }
+    .section-heading {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text-prim);
+      margin-bottom: 12px;
+    }
+    .heading-bar {
+      width: 80px;
+      height: 3px;
+      background: var(--accent);
+      border-radius: 2px;
+      margin-bottom: 48px;
+    }
+
+    /* ── HERO ── */
+    #hero {
+      padding: 120px var(--pad-x);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 20px;
+    }
+    .hero-photo {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      object-fit: cover;
+      object-position: center top;
+      border: 4px solid #fff;
+      box-shadow: 0 0 0 2px var(--border);
+      margin-bottom: 8px;
+    }
+    .hero-name {
+      font-size: 72px;
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -1.5px;
+    }
+    .hero-title {
+      font-size: 24px;
+      font-weight: 400;
+      color: var(--text-sec);
+    }
+    .hero-tagline {
+      font-size: 18px;
+      color: var(--text-sec);
+      max-width: 620px;
+      line-height: 1.7;
+      margin-top: 4px;
+    }
+    .btn {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 16px 32px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn:hover { background: #1d4ed8; transform: translateY(-1px); }
+
+    /* ── ABOUT ── */
+    #about { padding: 80px 0; border-top: 1px solid var(--border); }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+    .about-bio {
+      font-size: 16px;
+      color: var(--text-sec);
+      line-height: 1.75;
+    }
+    .skills-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-prim);
+      margin-bottom: 16px;
+    }
+    .skills-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 14px;
+      background: var(--chip-bg);
+      color: var(--text-sec);
+      font-size: 13px;
+      font-weight: 500;
+      border-radius: 9999px;
+    }
+
+    /* ── EXPERIENCE ── */
+    #experience { padding: 80px 0; border-top: 1px solid var(--border); }
+    .cards {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+    }
+    .card-role {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-prim);
+      margin-bottom: 6px;
+    }
+    .card-company {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+    .card-divider {
+      height: 1px;
+      background: var(--border);
+      margin-bottom: 20px;
+    }
+    .card-desc {
+      font-size: 15px;
+      color: var(--text-sec);
+      line-height: 1.6;
+    }
+
+    /* ── CONTACT ── */
+    #contact {
+      padding: 80px 0;
+      background: var(--contact-bg);
+      border-top: 1px solid var(--border);
+    }
+    #contact .inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    #contact .section-heading { margin-bottom: 12px; }
+    .contact-sub {
+      font-size: 16px;
+      color: var(--text-sec);
+      max-width: 500px;
+      line-height: 1.7;
+      margin-bottom: 32px;
+    }
+    .contact-links {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    .contact-links a {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      transition: color 0.2s;
+    }
+    .contact-links a:hover { color: #1d4ed8; }
+    .contact-sep {
+      color: var(--border);
+      font-size: 20px;
+      line-height: 1;
+    }
+    .contact-phone {
+      font-size: 16px;
+      color: var(--text-sec);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      height: 72px;
+      display: flex;
+      align-items: center;
+    }
+    .footer-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 var(--pad-x);
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    footer span {
+      font-size: 13px;
+      color: var(--text-sec);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      :root { --pad-x: 24px; }
+      .hero-name { font-size: 48px; }
+      .about-grid { grid-template-columns: 1fr; gap: 40px; }
+    }
+    @media (max-width: 600px) {
+      .hero-name { font-size: 36px; }
+      .hero-title { font-size: 18px; }
+      .hero-tagline { font-size: 16px; }
+      nav { padding: 0 24px; }
+      .nav-links { gap: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <header>
+    <nav>
+      <a class="nav-logo" href="#">Christopher Romanyk</a>
+      <ul class="nav-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <section id="hero">
+    <img class="hero-photo" src="assets/photo.png" alt="Christopher Romanyk" />
+    <h1 class="hero-name">Christopher Romanyk</h1>
+    <p class="hero-title">Systems Engineer &amp; Marine Mechanic</p>
+    <p class="hero-tagline">Reformed software engineer turned marine mechanic — bridging digital systems and mechanical expertise across high-stakes environments.</p>
+    <a class="btn" href="#contact">Get in touch</a>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="inner">
+      <h2 class="section-heading">About</h2>
+      <div class="heading-bar"></div>
+      <div class="about-grid">
+        <p class="about-bio">A strategic technical leader with a rare combination of software product management experience and hands-on marine mechanical expertise. Background spans consumer products, fintech, sports tech, and maritime systems — with a consistent focus on cross-functional leadership and operational rigour.</p>
+        <div>
+          <p class="skills-label">Core Skills</p>
+          <div class="skills-grid">
+            <span class="chip">Systems Engineering</span>
+            <span class="chip">Product Management</span>
+            <span class="chip">Marine Diesel</span>
+            <span class="chip">SOX Compliance</span>
+            <span class="chip">Cross-functional Leadership</span>
+            <span class="chip">Agile</span>
+            <span class="chip">Data Analysis</span>
+            <span class="chip">Team Leadership</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section id="experience">
+    <div class="inner">
+      <h2 class="section-heading">Experience</h2>
+      <div class="heading-bar"></div>
+      <div class="cards">
+
+        <article class="card">
+          <p class="card-role">Sr. PMT Tech II / Product Manager</p>
+          <p class="card-company">Amazon</p>
+          <div class="card-divider"></div>
+          <p class="card-desc">Led financial reconciliation systems and SOX compliance initiatives across global operations. Managed cross-functional engineering and operations teams to deliver high-reliability internal tooling.</p>
+        </article>
+
+        <article class="card">
+          <p class="card-role">Sr. Product Manager</p>
+          <p class="card-company">Google — Global Business Organization</p>
+          <div class="card-divider"></div>
+          <p class="card-desc">Drove product strategy for the Global Business Organization, aligning technical roadmaps with international sales and operations requirements across multiple markets.</p>
+        </article>
+
+        <article class="card">
+          <p class="card-role">Sr. Product Manager</p>
+          <p class="card-company">Synergy Sports / SportRadar</p>
+          <div class="card-divider"></div>
+          <p class="card-desc">Built and launched coaching analytics solutions adopted by professional sports franchises. Owned the full product lifecycle from discovery through delivery and growth.</p>
+        </article>
+
+        <article class="card">
+          <p class="card-role">Consumer Product Owner</p>
+          <p class="card-company">PBSC / Lyft</p>
+          <div class="card-divider"></div>
+          <p class="card-desc">Owned consumer-facing bike-sharing product features for Lyft's North American fleet. Partnered with hardware, software, and ops teams to improve rider experience and fleet reliability.</p>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="inner">
+      <h2 class="section-heading">Get in Touch</h2>
+      <div class="heading-bar"></div>
+      <p class="contact-sub">Open to new opportunities and interesting projects. Feel free to reach out.</p>
+      <div class="contact-links">
+        <a href="mailto:chris@hahnsolo.ca">chris@hahnsolo.ca</a>
+        <span class="contact-sep">·</span>
+        <span class="contact-phone">709.749.3429</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <span>© 2025 Christopher Romanyk. All rights reserved.</span>
+      <span>St. John's, NL</span>
+    </div>
+  </footer>
+
+</body>
+</html>
