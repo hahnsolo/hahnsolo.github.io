@@ -137,18 +137,17 @@
     const resolvedStyle = style === 'SemiBold' ? FONT_SEMIBOLD : style;
     t.fontName = { family: FONT_FAMILY, style: resolvedStyle };
     t.fontSize = size;
-    if (opts.width) {
-      t.textAutoResize = 'HEIGHT';
-      t.resize(opts.width, t.height);
-    } else {
-      t.textAutoResize = 'WIDTH_AND_HEIGHT';
-    }
+    // Set characters FIRST so t.height is a real positive value before resize
     t.characters = content;
     t.fills = solidFill(colorHex);
     if (opts.lineHeight) t.lineHeight = { value: opts.lineHeight, unit: 'PIXELS' };
     if (opts.letterSpacing) t.letterSpacing = { value: opts.letterSpacing, unit: 'PERCENT' };
     if (opts.align) t.textAlignHorizontal = opts.align;
     if (opts.decoration) t.textDecoration = opts.decoration;
+    if (opts.width) {
+      t.textAutoResize = 'HEIGHT';
+      t.resize(opts.width, t.height); // t.height is now valid (content already rendered)
+    }
     return t;
   }
 
