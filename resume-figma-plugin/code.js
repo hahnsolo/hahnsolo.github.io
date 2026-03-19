@@ -23,6 +23,14 @@
     location: 'St. John\'s, NL',
     bio:      'A strategic technical leader with a rare combination of software product management experience and hands-on marine mechanical expertise. Background spans consumer products, fintech, sports tech, and maritime systems — with a consistent focus on cross-functional leadership and operational rigour.',
     skills:   ['Systems Engineering', 'Product Management', 'Marine Diesel', 'SOX Compliance', 'Cross-functional Leadership', 'Agile', 'Data Analysis', 'Team Leadership'],
+    blog: [
+      {
+        category: 'Career',
+        title:    'From PM to Oiler: What I Learned Crossing Industries and Oceans',
+        date:     'March 2025',
+        excerpt:  'Leaving a decade in tech to work in marine engineering wasn\'t a step back — it was a masterclass in systems thinking, humility, and the value of getting your hands dirty.',
+      },
+    ],
     experience: [
       {
         role:    'Sr. PMT Tech II / Product Manager',
@@ -204,7 +212,7 @@
       gap: 36,
       crossAlign: 'CENTER',
     });
-    ['About', 'Experience', 'Contact'].forEach(label => {
+    ['About', 'Blog', 'Experience', 'Contact'].forEach(label => {
       links.appendChild(makeText(label, 'Regular', 15, COLOR.textSec));
     });
     nav.appendChild(links);
@@ -342,6 +350,83 @@
     row.appendChild(skillsCol);
     section.appendChild(row);
 
+    appendSection(parent, section);
+  }
+
+  // ─── BLOG ─────────────────────────────────────────────────────────────────
+
+  function buildBlogCard(post, cardWidth) {
+    const card = makeFrame('Blog Card — ' + post.title.slice(0, 20), cardWidth, 'VERTICAL', {
+      primaryAxis: 'AUTO',
+      counterAxis: 'FIXED',
+      pt: 28, pb: 28, pl: 28, pr: 28,
+      gap: 12,
+      fills: solidFill(COLOR.bg),
+      cornerRadius: 12,
+    });
+    card.strokes = [{ type: 'SOLID', color: { r: 229/255, g: 231/255, b: 235/255 } }];
+    card.strokeWeight = 1;
+    card.strokeAlign = 'INSIDE';
+
+    // Category chip
+    const chip = makeFrame('Category', 0, 'HORIZONTAL', {
+      primaryAxis: 'AUTO', counterAxis: 'AUTO',
+      pl: 10, pr: 10, pt: 4, pb: 4,
+      fills: solidFill('#EFF6FF'),
+      cornerRadius: 9999,
+      crossAlign: 'CENTER',
+    });
+    chip.appendChild(makeText(post.category, 'SemiBold', 12, COLOR.accent));
+    card.appendChild(chip);
+
+    // Title
+    card.appendChild(makeText(post.title, 'Bold', 17, COLOR.textPrim, {
+      width: cardWidth - 56,
+      lineHeight: 26,
+    }));
+
+    // Divider
+    card.appendChild(makeRect(cardWidth - 56, 1, COLOR.border));
+
+    // Excerpt
+    card.appendChild(makeText(post.excerpt, 'Regular', 14, COLOR.textSec, {
+      width: cardWidth - 56,
+      lineHeight: 22,
+    }));
+
+    // Date
+    card.appendChild(makeText(post.date, 'Regular', 13, COLOR.textSec));
+
+    return card;
+  }
+
+  function buildBlog(parent) {
+    const section = makeFrame('Blog', 1440, 'VERTICAL', {
+      fills: solidFill(COLOR.bg),
+      primaryAxis: 'AUTO',
+      counterAxis: 'FIXED',
+      pt: 80, pb: 80, pl: 80, pr: 80,
+      gap: 48,
+    });
+
+    section.appendChild(makeText('Blog', 'Bold', 32, COLOR.textPrim));
+
+    const headDivider = makeRect(80, 3, COLOR.accent);
+    headDivider.cornerRadius = 2;
+    section.appendChild(headDivider);
+
+    const cardWidth = Math.floor((1280 - 40) / 3); // 3 cards, 2 gaps of 20
+    const row = makeFrame('Blog Cards', 1280, 'HORIZONTAL', {
+      primaryAxis: 'AUTO',
+      counterAxis: 'AUTO',
+      gap: 20,
+    });
+
+    CONTENT.blog.forEach(post => {
+      row.appendChild(buildBlogCard(post, cardWidth));
+    });
+
+    section.appendChild(row);
     appendSection(parent, section);
   }
 
@@ -488,6 +573,7 @@
   buildNavigation(root);
   buildHero(root);
   buildAbout(root);
+  buildBlog(root);
   buildExperience(root);
   buildContact(root);
   buildFooter(root);
