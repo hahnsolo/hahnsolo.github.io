@@ -542,13 +542,26 @@
 
   // ─── ASSEMBLE ─────────────────────────────────────────────────────────────
 
-  buildNavigation(root);
-  buildHero(root);
-  buildAbout(root);
-  buildBlog(root);
-  buildExperience(root);
-  buildContact(root);
-  buildFooter(root);
+  var sections = [
+    ['Navigation', function() { buildNavigation(root); }],
+    ['Hero',       function() { buildHero(root); }],
+    ['About',      function() { buildAbout(root); }],
+    ['Blog',       function() { buildBlog(root); }],
+    ['Experience', function() { buildExperience(root); }],
+    ['Contact',    function() { buildContact(root); }],
+    ['Footer',     function() { buildFooter(root); }],
+  ];
+
+  for (var i = 0; i < sections.length; i++) {
+    try {
+      sections[i][1]();
+    } catch (e) {
+      console.error('SECTION FAILED: ' + sections[i][0]);
+      console.error('MESSAGE: ' + (e.message || String(e)));
+      figma.closePlugin();
+      return;
+    }
+  }
 
   figma.currentPage.appendChild(root);
   figma.viewport.scrollAndZoomIntoView([root]);
