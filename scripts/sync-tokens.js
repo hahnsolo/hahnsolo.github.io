@@ -56,10 +56,11 @@ const newColor = `const COLOR = {
     border:    '${c.border}',
     chipBg:    '${c.tealLight}',
     contactBg: '${c.bgDark}',
-  }`;
+    cardBg:    '${c.cardBg}',
+  };`;
 
 let plugin = fs.readFileSync(PLUGIN_PATH, 'utf8');
-plugin = plugin.replace(/const COLOR = \{[^}]+\}/, newColor);
+plugin = plugin.replace(/const COLOR = \{[^}]+\};?/, newColor);
 fs.writeFileSync(PLUGIN_PATH, plugin, 'utf8');
 console.log('✓ code.js COLOR block updated');
 
