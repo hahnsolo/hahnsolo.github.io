@@ -91,6 +91,14 @@
     .card:nth-child(even) .card-company { color: var(--teal); }
     .card-divider { height: 2px; background: var(--border); margin-bottom: 20px; }
     .card-desc { font-size: 15px; color: var(--text-sec); line-height: 1.7; }
+    /* EXPERIENCE TABS */
+    .exp-tabs { display: inline-flex; gap: 32px; border-bottom: 2px solid var(--border); margin-bottom: 32px; }
+    .exp-tab { display: inline-flex; align-items: center; gap: 8px; font-family: inherit; font-size: 15px; font-weight: 700; padding: 4px 2px 14px; margin-bottom: -2px; color: #64748B; background: none; border: 0; border-bottom: 3px solid transparent; cursor: pointer; transition: color 0.2s, border-color 0.2s; }
+    .exp-tab svg { width: 17px; height: 17px; }
+    .exp-tab:hover { color: var(--text-prim); }
+    .exp-tab.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+    .exp-group[hidden] { display: none; }
+    @media (max-width: 600px) { .exp-tabs { gap: 20px; } .exp-tab { font-size: 14px; } }
 
     /* CONTACT */
     .dark-section .inner { display: flex; flex-direction: column; align-items: center; text-align: center; }
@@ -191,7 +199,18 @@
         <div class="section-label cyan">&#9670; Work History</div>
         <h2 class="section-heading">Experience</h2>
       </div>
-      <div class="cards">
+      <div class="exp-tabs" role="tablist" aria-label="Experience domains">
+        <button class="exp-tab active" id="tab-tech" role="tab" aria-selected="true" aria-controls="panel-tech" data-target="tech">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="1"/><path d="M9 2v2M15 2v2M9 20v2M15 20v2M2 9h2M2 15h2M20 9h2M20 15h2"/></svg>
+          Technology
+        </button>
+        <button class="exp-tab" id="tab-marine" role="tab" aria-selected="false" aria-controls="panel-marine" data-target="marine">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="5" r="2"/><path d="M12 22V7M5 12H2a10 10 0 0 0 20 0h-3M8 9h8"/></svg>
+          Marine Services
+        </button>
+      </div>
+
+      <div class="cards exp-group" id="panel-tech" role="tabpanel" aria-labelledby="tab-tech" data-group="tech">
         <article class="card">
           <p class="card-role">Sr. PMT Tech II / Product Manager</p>
           <p class="card-company">Amazon</p>
@@ -215,6 +234,21 @@
           <p class="card-company">PBSC / Lyft</p>
           <div class="card-divider"></div>
           <p class="card-desc">Owned consumer-facing bike-sharing product features for Lyft's North American fleet. Partnered with hardware, software, and ops teams to improve rider experience and fleet reliability.</p>
+        </article>
+      </div>
+
+      <div class="cards exp-group" id="panel-marine" role="tabpanel" aria-labelledby="tab-marine" data-group="marine" hidden>
+        <article class="card">
+          <p class="card-role">Oiler / Marine Mechanic</p>
+          <p class="card-company">MV Legionnaire &#8212; Provincial Ferry Services</p>
+          <div class="card-divider"></div>
+          <p class="card-desc">Placeholder &#8212; engine-room operations, watchkeeping, and maintenance aboard an ice-class Ro-Pax ferry. Replace with your real role details.</p>
+        </article>
+        <article class="card">
+          <p class="card-role">Marine Role Title</p>
+          <p class="card-company">Vessel / Employer</p>
+          <div class="card-divider"></div>
+          <p class="card-desc">Placeholder &#8212; add a second marine position here, or remove this card.</p>
         </article>
       </div>
     </div>
@@ -242,5 +276,24 @@
     </div>
   </footer>
 
+  <script>
+    (function () {
+      var tabs = document.querySelectorAll('.exp-tab');
+      var groups = document.querySelectorAll('.exp-group');
+      tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          var target = tab.getAttribute('data-target');
+          tabs.forEach(function (t) {
+            var on = t === tab;
+            t.classList.toggle('active', on);
+            t.setAttribute('aria-selected', on ? 'true' : 'false');
+          });
+          groups.forEach(function (g) {
+            g.hidden = g.getAttribute('data-group') !== target;
+          });
+        });
+      });
+    })();
+  </script>
 </body>
-</html>
+</html>
