@@ -22,7 +22,7 @@
   const CONTENT = {
     name:     'Christopher Romanyk',
     title:    'Systems Engineer & Marine Mechanic',
-    tagline:  'Reformed software engineer turned marine mechanic — bridging digital systems and mechanical expertise across high-stakes environments.',
+    tagline:  'Reformed product leader turned Marine Mechanic. Bridging the new and old worlds, building on land and at sea.',
     email:    'chris@hahnsolo.ca',
     phone:    '709.749.3429',
     location: 'St. John\'s, NL',
