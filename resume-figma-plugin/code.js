@@ -26,7 +26,7 @@
     email:    'chris@hahnsolo.ca',
     phone:    '709.749.3429',
     location: 'St. John\'s, NL',
-    bio:      'A strategic technical leader with a rare combination of software product management experience and hands-on marine mechanical expertise. Background spans consumer products, fintech, sports tech, and maritime systems — with a consistent focus on cross-functional leadership and operational rigour.',
+    bio:      'A strategic technical & product leader with a rare combination of hands-on vessel and machine space operations and software/product management experience. Building on land and sea, I leverage my significant technical expertise to ideate, develop, and drive vessel automation and future-proofing.',
     skills:   ['Systems Engineering', 'Product Management', 'Marine Diesel', 'SOX Compliance', 'Cross-functional Leadership', 'Agile', 'Data Analysis', 'Team Leadership'],
     blog: [
       {
