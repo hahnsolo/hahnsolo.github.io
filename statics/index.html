@@ -141,7 +141,7 @@ td.mono,.mono{font-family:var(--mono);font-size:13px}
 <header class="top"><div class="wrap">
   <a class="brand" href="#home">Statics<span> <b>12</b></span></a>
   <nav class="weeks" id="weekbar" aria-label="Weeks"></nav>
-  <a class="toplink" href="#formulas">Formulas</a>
+  <a class="toplink" href="#formulas">Formulas</a><button class="toplink drivebtn" id="drivebtn" type="button">Sign in</button>
 </div></header>
 <main class="wrap" id="app"></main>
 
@@ -164,6 +164,7 @@ const l=lsGet(); if(l) S=Object.assign(S,l);
 let saveTimer=null, saving=false, pending=false;
 function save(){
   lsSet();
+  if(window.S12onSave) try{window.S12onSave()}catch(e){}
   if(!dbRef) return;
   clearTimeout(saveTimer);
   saveTimer=setTimeout(flush,900);
@@ -178,6 +179,22 @@ async function flush(){
   if(pending){pending=false;flush()}
 }
 function setSync(m){syncMsg=m;const el=$('#sync');if(el)el.textContent=m}
+/* merge two progress states: keep the best of both */
+function mergeState(a,b){
+  a=a||{}; b=b||{};
+  const out={start:a.start||b.start||'',sessions:{},practice:{},tests:{},drafts:Object.assign({},b.drafts||{},a.drafts||{})};
+  for(const k of ['sessions','practice']){
+    const keys=new Set([...Object.keys(a[k]||{}),...Object.keys(b[k]||{})]);
+    keys.forEach(w=>{const x=(a[k]||{})[w]||[],y=(b[k]||{})[w]||[];const n=Math.max(x.length,y.length);out[k][w]=Array.from({length:n},(_,i)=>!!(x[i]||y[i]))});
+  }
+  const tk=new Set([...Object.keys(a.tests||{}),...Object.keys(b.tests||{})]);
+  tk.forEach(w=>{const x=(a.tests||{})[w],y=(b.tests||{})[w];
+    if(!x||!y){out.tests[w]=Object.assign({},x||y);return}
+    const newer=(x.date||'')>=(y.date||'')?x:y;
+    out.tests[w]={best:Math.max(x.best||0,y.best||0),attempts:Math.max(x.attempts||0,y.attempts||0),last:newer.last,date:newer.date};});
+  return out;
+}
+window.S12={get:()=>S,set:v=>{S=Object.assign({start:'',sessions:{},practice:{},tests:{},drafts:{}},v);lsSet();render()},merge:mergeState,setSync,rerender:()=>render()};
 (async()=>{
   try{
     if(!window.claude||!window.claude.use) return;
@@ -273,8 +290,9 @@ function home(){
     </div>
   </section>
   <section class="section"><h2>Print copies</h2><div class="panel"><p>Take these on board for when you're offline.</p><div class="row"><a class="btn ghost" href="Statics-12-Week-Study-Guide.pdf">Study guide (PDF)</a><a class="btn ghost" href="Statics-12-Week-Tests-and-Answers.pdf">Tests and answer key (PDF)</a></div></div></section>
-  <section class="section"><h2>Move your progress</h2>
+  <section class="section"><h2>Your progress</h2>
     <div class="panel">
+<p id="drivestatus"></p>
       <p>Progress saves on this device. To carry it to another phone or computer, copy your progress code here and paste it there.</p>
       <div class="row" style="margin-top:8px"><button class="btn ghost" id="copyprog">Copy progress code</button></div>
       <label for="pasteprog" class="label" style="display:block;margin-top:14px">Paste a code from another device</label>
@@ -457,5 +475,118 @@ window.addEventListener('hashchange',()=>{tab='plan';render()});
 render();
 })();
 </script>
+<style>.drivebtn{background:none;border:1px solid var(--line);border-radius:4px;padding:4px 8px;cursor:pointer;color:var(--navy)}.drivebtn[data-state=on]{color:var(--ok);border-color:var(--ok)}.drivebtn[data-state=reconnect]{color:var(--signal);border-color:var(--signal)}#drivestatus .btn{font-size:13px}</style><script>/* Google Drive sync for the hosted site.
+   Saves progress to a plain JSON file (statics-progress.json) in the user's own Drive.
+   Scope drive.file: the page can only see files it created, nothing else in Drive. */
+(function(){
+const CLIENT_ID='704435008156-bf6a4se3fuji4rbfd5jvhmagq9dt18vm.apps.googleusercontent.com';
+const FILE_NAME='statics-progress.json';
+const SCOPE='https://www.googleapis.com/auth/drive.file';
+const API='https://www.googleapis.com/drive/v3/files';
+const UP='https://www.googleapis.com/upload/drive/v3/files';
+if(!CLIENT_ID || CLIENT_ID.indexOf('__')===0) return;   // not configured yet: stay local-only
 
+let token=null, exp=0, fileId=null, tc=null, timer=null, busy=false, again=false, wanted=false;
+const ss={get:k=>{try{return JSON.parse(sessionStorage.getItem(k))}catch(e){return null}},set:(k,v)=>{try{sessionStorage.setItem(k,JSON.stringify(v))}catch(e){}},del:k=>{try{sessionStorage.removeItem(k)}catch(e){}}};
+const ls={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}},del:k=>{try{localStorage.removeItem(k)}catch(e){}}};
+const t0=ss.get('s12tok'); if(t0&&t0.exp>Date.now()+60000){token=t0.t;exp=t0.exp}
+fileId=ls.get('s12file');
+wanted=ls.get('s12drive')==='1';
+
+function status(){
+  if(token&&exp>Date.now()) return 'on';
+  return wanted?'reconnect':'off';
+}
+function paint(msg){
+  const b=document.getElementById('drivebtn');
+  const st=status();
+  if(b){b.textContent=st==='on'?'Drive ✓':st==='reconnect'?'Reconnect Drive':'Sign in';b.dataset.state=st;b.title=st==='on'?'Progress is syncing to Google Drive':'Sync progress to your Google Drive'}
+  const p=document.getElementById('drivestatus');
+  if(p) p.innerHTML=st==='on'
+    ? `<b>Synced to Google Drive</b> as <span class="mono">${FILE_NAME}</span>. Every device you sign in on loads and saves this file. <button class="btn ghost" id="driveout" style="margin-left:6px;padding:4px 10px">Sign out</button>`
+    : st==='reconnect'
+    ? `Google Drive sync is set up. Tap <b>Reconnect Drive</b> at the top to pick up where you left off. Google asks again about once an hour.`
+    : `<b>Sign in</b> at the top with Google to save progress to a file in your Drive and load it on any device.`;
+  const o=document.getElementById('driveout'); if(o) o.onclick=signOut;
+  if(msg) window.S12.setSync(msg);
+}
+window.S12paintDrive=paint;
+
+function loadGis(){return new Promise((res,rej)=>{if(window.google&&google.accounts&&google.accounts.oauth2)return res();const s=document.createElement('script');s.src='https://accounts.google.com/gsi/client';s.async=true;s.onload=res;s.onerror=()=>rej(new Error('gis'));document.head.appendChild(s)})}
+
+async function signIn(){
+  try{await loadGis()}catch(e){paint('Could not reach Google. Check your connection and try again.');return}
+  if(!tc) tc=google.accounts.oauth2.initTokenClient({client_id:CLIENT_ID,scope:SCOPE,callback:onToken,error_callback:()=>paint('Google sign-in was closed before it finished.')});
+  tc.requestAccessToken({prompt:wanted?'':'consent'});
+}
+async function onToken(r){
+  if(r.error){paint('Google sign-in failed: '+r.error);return}
+  token=r.access_token; exp=Date.now()+(r.expires_in||3600)*1000;
+  ss.set('s12tok',{t:token,exp}); wanted=true; ls.set('s12drive','1');
+  paint('Connecting to Google Drive…');
+  try{await pull(); paint('Synced to Google Drive')}catch(e){handle(e)}
+}
+function signOut(){
+  if(token&&window.google&&google.accounts) try{google.accounts.oauth2.revoke(token,()=>{})}catch(e){}
+  token=null;exp=0;wanted=false;ss.del('s12tok');ls.del('s12drive');
+  paint('Signed out. Progress saves on this device. Your Drive file is untouched.');
+}
+function handle(e){
+  if(e&&e.status===401){token=null;exp=0;ss.del('s12tok');paint('Google sign-in expired. Tap Reconnect Drive to keep syncing. Progress is safe on this device.')}
+  else paint('Drive sync failed just now. Saved on this device and will retry on your next change.');
+}
+async function api(url,opt={}){
+  const r=await fetch(url,Object.assign({},opt,{headers:Object.assign({Authorization:'Bearer '+token},opt.headers||{})}));
+  if(!r.ok){const e=new Error('drive '+r.status);e.status=r.status;throw e}
+  return r;
+}
+async function findFile(){
+  if(fileId){try{await api(`${API}/${fileId}?fields=id,trashed`).then(r=>r.json()).then(j=>{if(j.trashed)fileId=null});if(fileId)return fileId}catch(e){if(e.status===401)throw e;fileId=null}}
+  const q=encodeURIComponent(`name='${FILE_NAME}' and trashed=false`);
+  const j=await api(`${API}?q=${q}&spaces=drive&orderBy=modifiedTime desc&fields=files(id,modifiedTime)`).then(r=>r.json());
+  fileId=j.files&&j.files[0]?j.files[0].id:null;
+  if(fileId) ls.set('s12file',fileId);
+  return fileId;
+}
+async function pull(){
+  const id=await findFile();
+  let merged=window.S12.get();
+  if(id){
+    const remote=await api(`${API}/${id}?alt=media`).then(r=>r.json()).catch(e=>{if(e.status)throw e;return {}});
+    merged=window.S12.merge(window.S12.get(),remote&&remote.progress?remote.progress:remote);
+    window.S12.set(merged);
+  }
+  await push(true);
+}
+function body(){return JSON.stringify({app:'Statics in Twelve Weeks',version:1,updated:new Date().toISOString(),progress:window.S12.get()},null,1)}
+async function push(){
+  if(status()!=='on') return;
+  if(busy){again=true;return}
+  busy=true;
+  try{
+    if(!fileId) await findFile();
+    if(fileId){
+      await api(`${UP}/${fileId}?uploadType=media`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:body()});
+    } else {
+      const meta={name:FILE_NAME,mimeType:'application/json',description:'Progress for the Statics in Twelve Weeks study hub'};
+      const bd='s12'+Math.random().toString(36).slice(2);
+      const multipart=`--${bd}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(meta)}\r\n--${bd}\r\nContent-Type: application/json\r\n\r\n${body()}\r\n--${bd}--`;
+      const j=await api(`${UP}?uploadType=multipart&fields=id`,{method:'POST',headers:{'Content-Type':'multipart/related; boundary='+bd},body:multipart}).then(r=>r.json());
+      fileId=j.id; ls.set('s12file',fileId);
+    }
+    const t=new Date(); paint('Synced to Google Drive at '+t.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}));
+  }catch(e){handle(e)}
+  busy=false;
+  if(again){again=false;push()}
+}
+window.S12onSave=()=>{if(status()!=='on')return;clearTimeout(timer);timer=setTimeout(push,1500)};
+
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#drivebtn');if(!b)return;e.preventDefault();
+  if(status()==='on'){location.hash='home';setTimeout(()=>{const p=document.getElementById('drivestatus');if(p)p.scrollIntoView({block:'center'})},50)}else signIn()});
+const obs=new MutationObserver(()=>{const p=document.getElementById('drivestatus');if(p&&!p.dataset.painted){p.dataset.painted='1';paint()}});
+obs.observe(document.getElementById('app'),{childList:true});
+paint();
+if(status()==='on') pull().catch(handle);   // same tab, token still valid: refresh from Drive
+})();
+</script>
 </body></html>
