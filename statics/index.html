@@ -134,6 +134,42 @@ td.mono,.mono{font-family:var(--mono);font-size:13px}
 .hint{font-size:13px;color:var(--muted)}
 .sync{font-size:12px;color:var(--muted)}
 .pager{display:flex;justify-content:space-between;gap:10px;margin-top:28px}
+
+/* lesson */
+.lesson{scroll-margin-top:64px}
+.lesson .lt{font-size:24px;margin-bottom:6px}
+.lesson .panel p{max-width:62ch}
+.eq{font-family:var(--mono);font-size:14px;background:var(--code);border-radius:4px;padding:8px 10px;display:block}
+.slip{border-left:3px solid var(--signal);padding-left:10px;color:var(--muted);font-size:14px}
+.ladder{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-family:var(--mono);font-size:14px;margin-block:4px 10px}
+.ladder span{background:var(--navy);color:var(--panel);padding:3px 8px;border-radius:3px}
+.ladder i{font-style:normal;color:var(--muted)}
+ol.mini,ul.mini{margin:0 0 .6em;padding-left:20px} .mini li{margin-block:3px}
+.lprog{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between}
+.dots{display:flex;gap:6px;flex-wrap:wrap}
+.dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--line);background:var(--panel);cursor:pointer;padding:0}
+.dot.ok{background:var(--ok);border-color:var(--ok)}
+.dot.on{border-color:var(--signal);box-shadow:0 0 0 2px var(--signal-soft)}
+.fig{width:100%;max-width:440px;height:auto;display:block;margin:8px auto 0}
+.fig .ax{stroke:var(--line);stroke-width:1.5}
+.fig .guide{stroke:var(--muted);stroke-width:1;stroke-dasharray:4 4;fill:none}
+.fig .arc{stroke:var(--muted);stroke-width:1.5;fill:none}
+.fig .lbl{fill:var(--ink);font:600 14px var(--body)} .fig .sm{font-size:12px;fill:var(--muted)}
+.fig .box{fill:var(--code);stroke:var(--line)} .fig .tri{fill:var(--code);stroke:var(--muted);stroke-width:1.5}
+.fig .vF{stroke:var(--signal)} .fig .vF-h{fill:var(--signal)}
+.fig .vX{stroke:var(--navy)} .fig .vX-h{fill:var(--navy)}
+.fig .vY{stroke:var(--ok)} .fig .vY-h{fill:var(--ok)}
+.fig .vE{stroke:var(--bad);stroke-dasharray:6 4} .fig .vE-h{fill:var(--bad)}
+.fig .cxs{fill:var(--navy)} .fig .cys{fill:var(--ok)} .fig .ceq{fill:var(--bad)}
+.wid{display:grid;gap:10px}
+.ctl{display:grid;gap:8px}
+.ctl label{display:grid;grid-template-columns:90px 1fr 64px;align-items:center;gap:10px;font:600 14px var(--display);letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.ctl input{width:100%;accent-color:var(--signal)}
+.ctl b{font:500 13px var(--mono);color:var(--ink);text-align:right}
+.read{display:grid;gap:4px;font-family:var(--mono);font-size:13.5px;background:var(--code);border-radius:4px;padding:8px 10px}
+.read .cx b{color:var(--navy)} .read .cy b{color:var(--ok)} .read .ceq b{color:var(--bad)}
+.guided .gstep{border-top:1px solid var(--line);padding-top:10px;margin-top:10px;display:grid;gap:8px}
+.lnav{justify-content:flex-start}
 @media (max-width:520px){.brand span{display:none}.srow{grid-template-columns:auto 1fr}.srow .time{grid-column:2}}
 @media (prefers-reduced-motion:no-preference){.q,.card{transition:border-color .15s}}
 </style>
@@ -233,6 +269,11 @@ function sessionsFor(w){
     ['90 min','Formula sheet','Rewrite the full formula sheet from memory, then check it against the Formulas page.'],
     ['60 min','Timed review problems',prac],
     ['90 min','Final exam','20 questions in one sitting, closed book, calculator and formula sheet only. Aim for 70% or more.']];
+  if(LESSONS[w.n]) return [
+    ['75 min','Interactive lesson','Lesson tab: '+LESSONS[w.n].length+' short screens with live diagrams, quick checks and step-by-step problems. This replaces reading the book.'],
+    ['45 min','Book (optional)','Skim §'+core+' for a second explanation, and try the worked example on the Example tab.'],
+    ['60 min','Book problems',prac+'. Check every answer in the back of the book.'],
+    ['60 min','Weekly test','10 questions, about 40 minutes, closed book. Pass mark '+PASS+'%. Read every explanation, including the ones you got right.']];
   return [
     ['90 min','Read','Core: §'+core+'.'+(skim?' Skim: §'+skim+'.':'')+' Copy each formula onto your cheat card as you meet it.'],
     ['90 min','Notes + worked example','Go through the Notes tab, then try the worked example yourself before revealing each step.'],
@@ -307,7 +348,7 @@ function home(){
 let tab='plan';
 function weekView(n){
   const w=W[n-1];
-  const tabs=[['plan','Plan'],['notes','Notes'],['example','Example'],['practice','Book problems'],['test',n===12?'Final exam':'Test']].filter(t=>!(t[0]==='example'&&!w.example));
+  const tabs=[...(LESSONS[n]?[['lesson','Lesson']]:[]),['plan','Plan'],['notes','Notes'],['example','Example'],['practice','Book problems'],['test',n===12?'Final exam':'Test']].filter(t=>!(t[0]==='example'&&!w.example));
   if(!tabs.find(t=>t[0]===tab)) tab='plan';
   const t=test(n);
   return `
@@ -322,6 +363,7 @@ function weekView(n){
 }
 function pane(w){
   const n=w.n, key='w'+n;
+  if(tab==='lesson'&&LESSONS[n]) return lessonPane(w);
   if(tab==='plan'){
     const ss=sessionsFor(w); const done=S.sessions[key]||[];
     return `<div class="stack">
@@ -407,6 +449,186 @@ function formulas(){
   <div class="stack" style="margin-top:14px">${W.filter(w=>w.formulas.length).map(w=>`<div class="panel"><div class="label" style="margin-bottom:6px">Week ${w.n} · ${esc(w.title)}</div><div class="tablewrap"><table class="formula"><tbody>${w.formulas.map(f=>`<tr><td>${f[0]}</td><td>${f[1]}</td></tr>`).join('')}</tbody></table></div></div>`).join('')}</div>`;
 }
 
+/* ---------- interactive lessons ---------- */
+/* Each lesson is a list of screens. A screen can carry text, a live diagram, a quick check
+   and a guided problem that is solved one step at a time. */
+const LESSONS = {
+ 1: [
+  { t:'Forces are arrows',
+    body:`<p>Everything in statics is about <b>forces</b>: pushes and pulls. To describe a force you need two things: <b>how big</b> it is and <b>which way</b> it points. Anything with a size and a direction is a <b>vector</b>, and we draw it as an arrow.</p>
+          <p>Things with only a size, like mass, time, temperature or volume, are <b>scalars</b>. "The pump weighs 2 kN" and "the oil is at 60 °C" sound alike, but only the first is a vector. Its weight points down.</p>`,
+    fig:'arrows',
+    checks:[{type:'mc',q:'Which of these needs a direction to describe it fully?',options:['Temperature of the lube oil','Mass of a pump','Pull on a mooring line','Volume of a fuel tank'],answer:2,explain:'A pull acts along the line in one direction, so it is a vector. The other three are scalars.'}]},
+
+  { t:'Mass is not weight',
+    body:`<p>Mass (kg) is how much stuff there is. <b>Weight</b> is the force gravity puts on that mass: <span class="eq">W = m × g</span>, with g = 9.81 m/s². Weight is in <b>newtons</b>.</p>
+          <p>The units go up in steps of 1000:</p>
+          <div class="ladder"><span>1 MN</span><i>= 1000 kN</i><span>1 kN</span><i>= 1000 N</i><span>1 N</span></div>
+          <p class="slip"><b>Common slip:</b> forgetting to multiply by g. A 1000 kg engine block weighs 9.81 kN, not 1 kN.</p>`,
+    checks:[
+      {type:'num',q:'A 400 kg motor is lifted out for overhaul. What is its weight in kN?',answer:3.924,unit:'kN',tol:2,explain:'W = 400 × 9.81 = 3924 N = 3.92 kN. Divide by 1000 to go from N to kN.'},
+      {type:'mc',q:'0.02 MN is the same as:',options:['2 N','20 N','200 N','20 kN'],answer:3,explain:'0.02 × 1 000 000 N = 20 000 N = 20 kN. MN to kN is ×1000.'}]},
+
+  { t:'Splitting a force into x and y parts',
+    body:`<p>Forces at odd angles are hard to add directly. The trick is to split each one into a horizontal part and a vertical part, called <b>components</b>. Measure the angle θ from the +x axis:</p>
+          <p class="eq">F<sub>x</sub> = F cos θ &nbsp;&nbsp; F<sub>y</sub> = F sin θ</p>
+          <p>Move the sliders and watch the parts change. Past 90° the x-part turns <b>negative</b>, because it points left. Past 180° the y-part does too.</p>`,
+    widget:'components',
+    checks:[
+      {type:'num',q:'An 8 kN force acts at 50° above the horizontal. What is its horizontal component?',answer:5.1423,unit:'kN',tol:2,explain:'F<sub>x</sub> = 8 cos 50° = 8 × 0.643 = 5.14 kN. Set the sliders to 8 and 50° to see it.'},
+      {type:'mc',q:'A force acts at 150° from the +x axis. Its x-component is:',options:['Positive','Negative','Zero','Equal to F'],answer:1,explain:'cos 150° is negative, so the force points partly to the left. Try 150° on the diagram.'}]},
+
+  { t:'Slopes given as triangles',
+    body:`<p>Drawings often give a direction as a little slope triangle instead of an angle, like a 3-4-5 or a 5-12-13. You don't need the angle at all. Each component is the force times <b>that side ÷ the long side</b>.</p>
+          <p class="eq">F<sub>x</sub> = F × (run ÷ hyp) &nbsp;&nbsp; F<sub>y</sub> = F × (rise ÷ hyp)</p>`,
+    fig:'triangle',
+    checks:[{type:'num',q:'A 260 N force acts along a slope that rises 5 for every 12 across (hypotenuse 13). What is its horizontal component?',answer:240,unit:'N',tol:2,explain:'F<sub>x</sub> = 260 × 12/13 = 240 N. The vertical part would be 260 × 5/13 = 100 N.'}]},
+
+  { t:'Adding two forces',
+    body:`<p>Two tugs on one tow: what's the total pull? Put the two arrows <b>tail to tail</b>, complete the parallelogram, and the diagonal is the <b>resultant</b> R.</p>
+          <p>Change the angle between them. At 0° they add straight up (R = A + B). At 180° they fight each other (R = A − B). Everything else falls in between.</p>`,
+    widget:'parallelogram',
+    checks:[{type:'mc',q:'Forces of 20 N and 50 N act on one point. Which resultant is impossible?',options:['30 N','45 N','70 N','80 N'],answer:3,explain:'R can only fall between 50 − 20 = 30 N and 50 + 20 = 70 N. 80 N is too big.'}]},
+
+  { t:'Getting the exact number',
+    body:`<p>For an exact answer, use the formula behind the diagram. With θ the angle <b>between the two forces</b>:</p>
+          <p class="eq">R = √(A² + B² + 2AB cos θ)</p>
+          <p>Then find the direction with the sine rule. In the force triangle, the angle opposite R is 180° − θ.</p>
+          <p class="eq">sin α = B × sin(180° − θ) ÷ R</p>
+          <p class="slip"><b>Common slip:</b> using the cosine rule in its "minus" form, C² = A² + B² − 2AB cos c, with the angle <i>between</i> the forces. That form needs the angle <i>inside the triangle</i>, which is 180° − θ. Both routes give the same R if you match the angle to the formula.</p>`,
+    guided:{title:'Two tugs, one tow',problem:'Tug 1 pulls with 50 kN. Tug 2 pulls with 35 kN. The angle between the two towlines is 60°.',
+      steps:[
+        {q:'Resultant R',answer:73.993,unit:'kN',tol:1.5,hint:'R = √(50² + 35² + 2·50·35·cos 60°). cos 60° = 0.5.',explain:'R = √(2500 + 1225 + 1750) = √5475 = 74.0 kN.'},
+        {q:'Angle α between R and the 50 kN towline',answer:24.18,unit:'°',abs_tol:1,hint:'sin α = 35 × sin 120° ÷ 74.0. sin 120° = sin 60° = 0.866.',explain:'sin α = 35 × 0.866 / 74.0 = 0.410, so α = 24.2°. R leans toward the bigger pull.'}]}},
+
+  { t:'Many forces: the component table',
+    body:`<p>With three or more forces, skip the parallelograms and use a <b>table</b>. It's the most reliable method there is:</p>
+          <ol class="mini"><li>Split every force into F<sub>x</sub> and F<sub>y</sub>, with signs.</li><li>Add the columns: ΣF<sub>x</sub> and ΣF<sub>y</sub>.</li><li>R = √(ΣF<sub>x</sub>² + ΣF<sub>y</sub>²).</li><li>θ = tan⁻¹(ΣF<sub>y</sub> ÷ ΣF<sub>x</sub>), then check the quadrant from the signs.</li></ol>
+          <p class="slip"><b>Common slip:</b> dropping a minus sign. A force at 210° points down and left, so both of its parts are negative.</p>`,
+    guided:{title:'Three lines on a padeye',problem:'Three forces pull on one padeye: 6 kN at 0°, 4 kN at 90° and 5 kN at 210°. Angles are measured anticlockwise from +x.',
+      table:[['6 kN at 0°','6.000','0'],['4 kN at 90°','0','4.000'],['5 kN at 210°','5 cos 210° = ?','5 sin 210° = ?']],
+      steps:[
+        {q:'ΣF<sub>x</sub>',answer:1.6699,unit:'kN',tol:2,hint:'5 cos 210° = −4.330. So ΣF<sub>x</sub> = 6 + 0 − 4.330.',explain:'ΣF<sub>x</sub> = 6 + 0 − 4.330 = 1.670 kN.'},
+        {q:'ΣF<sub>y</sub>',answer:1.5,unit:'kN',tol:2,hint:'5 sin 210° = −2.5. So ΣF<sub>y</sub> = 0 + 4 − 2.5.',explain:'ΣF<sub>y</sub> = 0 + 4 − 2.5 = 1.5 kN.'},
+        {q:'Resultant R',answer:2.2447,unit:'kN',tol:2,hint:'R = √(1.670² + 1.5²)',explain:'R = √(2.789 + 2.25) = 2.24 kN.'},
+        {q:'Direction θ from +x',answer:41.93,unit:'°',abs_tol:1,hint:'θ = tan⁻¹(1.5 ÷ 1.670). Both sums are positive, so R is in the first quadrant.',explain:'θ = tan⁻¹(0.898) = 41.9°.'}]}},
+
+  { t:'The equilibrant',
+    body:`<p>The <b>equilibrant</b> is the single force that would <b>cancel</b> everything and hold the point still. It's the resultant turned around: <b>same size, same line, opposite direction</b>. So its angle is θ<sub>R</sub> + 180°.</p>
+          <p>Exam papers like this word. The bollard foundation, the padeye weld, or the man on the tail line is supplying the equilibrant.</p>`,
+    widget:'equilibrant',
+    checks:[{type:'mc',q:'The resultant of a set of forces is 9 kN at 40°. The equilibrant is:',options:['9 kN at 40°','9 kN at 220°','18 kN at 40°','9 kN at 130°'],answer:1,explain:'Same size, opposite direction: 40° + 180° = 220°.'}]},
+
+  { t:'Ready check',
+    body:`<p>That's week 1. Here's everything the test asks, on one card:</p>
+          <ul class="mini"><li>Vector = size + direction. Scalar = size only.</li><li>W = mg, with g = 9.81. N → kN → MN in steps of ×1000.</li><li>F<sub>x</sub> = F cos θ, F<sub>y</sub> = F sin θ, with θ from +x. Watch the signs.</li><li>Slope triangle: side ÷ hypotenuse.</li><li>Two forces: R = √(A² + B² + 2AB cos θ), then the sine rule for direction. R always lies between A − B and A + B.</li><li>Many forces: component table, then R and θ.</li><li>Equilibrant = resultant reversed (+180°).</li></ul>
+          <p>Do the test closed book. The pass mark is 70%. If you miss one, the explanation will point back to the screen that covers it.</p>`,
+    finish:true}
+ ]
+};
+
+/* ----- small SVG helpers ----- */
+function arrow(x1,y1,x2,y2,cls,w){const a=Math.atan2(y2-y1,x2-x1),h=9;const L=Math.hypot(x2-x1,y2-y1);if(L<2)return '';
+  const p1=[x2-h*Math.cos(a-0.4),y2-h*Math.sin(a-0.4)],p2=[x2-h*Math.cos(a+0.4),y2-h*Math.sin(a+0.4)];
+  return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="${cls}" stroke-width="${w||2.5}"/><polygon points="${x2},${y2} ${p1[0]},${p1[1]} ${p2[0]},${p2[1]}" class="${cls}-h"/>`}
+const r3=x=>{const a=Math.abs(x);return (a>=100?x.toFixed(0):a>=10?x.toFixed(1):x.toFixed(2)).replace('-','−')};
+
+function figure(kind){
+  if(kind==='arrows') return `<svg viewBox="0 0 320 120" class="fig" role="img" aria-label="A force arrow and a scalar value">
+      ${arrow(30,90,150,30,'vF',3)}<text x="70" y="45" class="lbl">F = 5 kN</text><text x="40" y="112" class="lbl sm">size + direction</text>
+      <rect x="200" y="45" width="90" height="34" rx="4" class="box"/><text x="245" y="67" text-anchor="middle" class="lbl">60 °C</text><text x="245" y="112" text-anchor="middle" class="lbl sm">size only</text></svg>`;
+  if(kind==='triangle') return `<svg viewBox="0 0 320 150" class="fig" role="img" aria-label="5-12-13 slope triangle">
+      <polygon points="40,120 280,120 280,20" class="tri"/><text x="160" y="140" text-anchor="middle" class="lbl">12 (run)</text><text x="292" y="75" class="lbl">5</text><text x="140" y="60" class="lbl" transform="rotate(-22.6 140 60)">13 (hyp)</text>
+      ${arrow(60,112,200,54,'vF',3)}<text x="150" y="104" class="lbl sm">F</text></svg>`;
+  return '';
+}
+
+function widget(kind,host){
+  if(kind==='components'){
+    host.innerHTML=`<div class="wid"><svg viewBox="0 0 320 240" class="fig" id="wsvg"></svg>
+      <div class="ctl"><label>F <input type="range" id="wF" min="1" max="12" value="10"><b id="wFv"></b></label><label>θ <input type="range" id="wT" min="0" max="360" value="35"><b id="wTv"></b></label></div>
+      <div class="read" id="wread"></div></div>`;
+    const draw=()=>{const F=+$('#wF',host).value,T=+$('#wT',host).value,s=9,ox=160,oy=120;
+      const fx=F*Math.cos(T*Math.PI/180),fy=F*Math.sin(T*Math.PI/180);const ex=ox+fx*s,ey=oy-fy*s;
+      $('#wFv',host).textContent=F+' kN';$('#wTv',host).textContent=T+'°';
+      const arc=T>0?`<path d="M ${ox+28} ${oy} A 28 28 0 ${T>180?1:0} 0 ${ox+28*Math.cos(T*Math.PI/180)} ${oy-28*Math.sin(T*Math.PI/180)}" class="arc"/>`:'';
+      $('#wsvg',host).innerHTML=`<line x1="10" y1="${oy}" x2="310" y2="${oy}" class="ax"/><line x1="${ox}" y1="10" x2="${ox}" y2="230" class="ax"/><text x="304" y="${oy-6}" class="lbl sm">+x</text><text x="${ox+6}" y="20" class="lbl sm">+y</text>
+        <line x1="${ex}" y1="${ey}" x2="${ex}" y2="${oy}" class="guide"/><line x1="${ex}" y1="${ey}" x2="${ox}" y2="${ey}" class="guide"/>
+        ${arrow(ox,oy,ex,oy,'vX',3)}${arrow(ox,oy,ox,ey,'vY',3)}${arrow(ox,oy,ex,ey,'vF',3.5)}${arc}
+        <text x="${ox+34}" y="${oy-8}" class="lbl sm">θ</text>`;
+      $('#wread',host).innerHTML=`<span class="cx">F<sub>x</sub> = ${F} cos ${T}° = <b>${r3(fx)} kN</b></span><span class="cy">F<sub>y</sub> = ${F} sin ${T}° = <b>${r3(fy)} kN</b></span>`};
+    host.querySelectorAll('input').forEach(i=>i.addEventListener('input',draw));draw();return;}
+  if(kind==='parallelogram'||kind==='equilibrant'){
+    const eq=kind==='equilibrant';
+    host.innerHTML=`<div class="wid"><svg viewBox="0 0 320 240" class="fig" id="wsvg"></svg>
+      <div class="ctl"><label>A <input type="range" id="wA" min="5" max="60" value="${eq?30:40}"><b id="wAv"></b></label><label>B <input type="range" id="wB" min="5" max="60" value="${eq?25:30}"><b id="wBv"></b></label><label>θ between <input type="range" id="wT" min="0" max="180" value="${eq?70:50}"><b id="wTv"></b></label></div>
+      <div class="read" id="wread"></div></div>`;
+    const draw=()=>{const A=+$('#wA',host).value,B=+$('#wB',host).value,T=+$('#wT',host).value,t=T*Math.PI/180;
+      const Rx=A+B*Math.cos(t),Ry=B*Math.sin(t),R=Math.hypot(Rx,Ry),al=Math.atan2(Ry,Rx)*180/Math.PI;
+      const s=Math.min(2.2,150/Math.max(A+B,1)),ox=eq?160:70,oy=eq?130:190;
+      const P=(x,y)=>[ox+x*s,oy-y*s];const [ax,ay]=P(A,0),[bx,by]=P(B*Math.cos(t),B*Math.sin(t)),[rx,ry]=P(Rx,Ry),[qx,qy]=P(-Rx,-Ry);
+      $('#wAv',host).textContent=A+' kN';$('#wBv',host).textContent=B+' kN';$('#wTv',host).textContent=T+'°';
+      $('#wsvg',host).innerHTML=`<line x1="${ax}" y1="${ay}" x2="${rx}" y2="${ry}" class="guide"/><line x1="${bx}" y1="${by}" x2="${rx}" y2="${ry}" class="guide"/>
+        ${arrow(ox,oy,ax,ay,'vX',3)}${arrow(ox,oy,bx,by,'vY',3)}${arrow(ox,oy,rx,ry,'vF',3.5)}${eq?arrow(ox,oy,qx,qy,'vE',3.5):''}
+        <text x="${ax-4}" y="${ay+16}" class="lbl sm cxs">A</text><text x="${bx+6}" y="${by}" class="lbl sm cys">B</text><text x="${rx+6}" y="${ry-4}" class="lbl sm">R</text>${eq?`<text x="${qx-8}" y="${qy+14}" class="lbl sm ceq" text-anchor="end">E</text>`:''}`;
+      $('#wread',host).innerHTML=`<span>R = √(A² + B² + 2AB cos θ) = <b>${r3(R)} kN</b></span><span>R makes <b>${r3(al)}°</b> with A</span>`+(eq?`<span class="ceq">Equilibrant E = <b>${r3(R)} kN</b> at <b>${r3(al+180)}°</b></span>`:`<span class="hint">Range: ${Math.abs(A-B)} to ${A+B} kN</span>`)};
+    host.querySelectorAll('input').forEach(i=>i.addEventListener('input',draw));draw();return;}
+}
+
+/* ----- lesson view ----- */
+function lessonState(n){S.lessons=S.lessons||{};return S.lessons['w'+n]=S.lessons['w'+n]||{at:0,done:{}}}
+function lessonPane(w){
+  const L=LESSONS[w.n],st=lessonState(w.n),i=Math.min(st.at||0,L.length-1),sc=L[i];
+  const doneCount=Object.keys(st.done).length;
+  const dots=L.map((s,k)=>`<button class="dot ${k===i?'on':''} ${st.done[k]?'ok':''}" data-go="${k}" aria-label="Screen ${k+1}: ${esc(s.t)}"></button>`).join('');
+  let checks='';
+  if(sc.checks) checks=sc.checks.map((c,j)=>{const id=`lc-${i}-${j}`;
+    const body=c.type==='mc'?`<div class="opts">${c.options.map((o,k)=>`<label class="opt"><input type="radio" name="${id}" value="${k}"><span>${o}</span></label>`).join('')}</div>`
+      :`<div class="numin"><input id="${id}" inputmode="decimal" autocomplete="off" placeholder="Your answer"><span class="u">${c.unit}</span></div>`;
+    return `<div class="q lcheck" data-c="${j}"><div class="qn">Quick check</div><div>${c.q}</div>${body}<div class="row"><button class="btn ghost lcbtn" data-c="${j}">Check</button></div><div class="fb" hidden></div></div>`}).join('');
+  let guided='';
+  if(sc.guided){const g=sc.guided;
+    const tbl=g.table?`<div class="tablewrap"><table><thead><tr><th>Force</th><th>F<sub>x</sub> (kN)</th><th>F<sub>y</sub> (kN)</th></tr></thead><tbody>${g.table.map(r=>`<tr><td>${r[0]}</td><td class="mono">${r[1]}</td><td class="mono">${r[2]}</td></tr>`).join('')}</tbody></table></div>`:'';
+    guided=`<div class="panel guided"><div class="label">Try it step by step · ${g.title}</div><p style="margin-top:4px">${g.problem}</p>${tbl}
+      ${g.steps.map((s,k)=>`<div class="gstep" data-k="${k}" ${k>0?'hidden':''}><div class="gq"><span class="qn">Step ${k+1}</span> ${s.q}</div>
+        <div class="numin"><input id="gs-${i}-${k}" inputmode="decimal" autocomplete="off" placeholder="Your answer"><span class="u">${s.unit}</span><button class="btn ghost gbtn" data-k="${k}">Check</button></div>
+        <div class="fb" hidden></div></div>`).join('')}</div>`}
+  const fig=sc.fig?figure(sc.fig):'';
+  return `<div class="stack lesson">
+    <div class="lprog"><span class="label">Screen ${i+1} of ${L.length}</span><div class="dots">${dots}</div></div>
+    <div class="panel"><h3 class="lt">${sc.t}</h3>${sc.body}${fig}</div>
+    ${sc.widget?`<div class="panel" id="lwidget"></div>`:''}
+    ${guided}${checks}
+    <div class="row lnav">${i>0?`<button class="btn ghost" data-go="${i-1}">← Back</button>`:''}${sc.finish?`<button class="btn" id="totest">Take the week ${w.n} test →</button>`:`<button class="btn" data-go="${i+1}" id="lnext">Next →</button>`}<span class="hint">${doneCount} of ${L.length} screens done</span></div>
+  </div>`;
+}
+function bindLesson(w){
+  const L=LESSONS[w.n],st=lessonState(w.n),i=Math.min(st.at||0,L.length-1),sc=L[i];
+  const repaint=()=>{$('#pane').innerHTML=pane(w);bindPane(w);const p=document.querySelector('.lesson');if(p)p.scrollIntoView({block:'start'})};
+  document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>{st.at=+b.dataset.go;save();repaint()}));
+  if(sc.widget) widget(sc.widget,$('#lwidget'));
+  const need=(sc.checks?sc.checks.length:0)+(sc.guided?1:0);let got=0;
+  const markDone=()=>{got++;if(got>=need){st.done[i]=true;save();const d=document.querySelectorAll('.dot')[i];if(d)d.classList.add('ok')}};
+  if(!need&&!sc.finish){st.done[i]=true;save()}
+  if(sc.finish){st.done[i]=true;save();$('#totest').addEventListener('click',()=>{tab='test';$('#pane').innerHTML=pane(w);bindPane(w);document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected',x.dataset.tab==='test'))})}
+  document.querySelectorAll('.lcbtn').forEach(b=>{let tries=0;b.addEventListener('click',()=>{
+    const j=+b.dataset.c,c=sc.checks[j],box=b.closest('.lcheck'),fb=box.querySelector('.fb');
+    const a=c.type==='mc'?(box.querySelector('input:checked')||{}).value:box.querySelector('input').value;
+    if(a===undefined||a===''){fb.hidden=false;fb.innerHTML='Pick or type an answer first.';return}
+    tries++;const ok=isRight(c,a);fb.hidden=false;
+    if(ok){box.classList.add('right');box.classList.remove('wrong');fb.innerHTML=`<b class="r">Correct.</b> ${c.explain}`;b.disabled=true;markDone()}
+    else if(tries<2){box.classList.add('wrong');fb.innerHTML=`<b class="w">Not quite.</b> Have another go${sc.widget?', and try it on the diagram above':''}.`}
+    else{box.classList.add('wrong');fb.innerHTML=`<b class="w">Here's how:</b> ${c.type==='num'?'the answer is <b>'+r3(c.answer)+' '+c.unit+'</b>. ':''}${c.explain}`;b.disabled=true;markDone()}})});
+  document.querySelectorAll('.gbtn').forEach(b=>{let tries=0;b.addEventListener('click',()=>{
+    const k=+b.dataset.k,s=sc.guided.steps[k],row=b.closest('.gstep'),fb=row.querySelector('.fb'),v=row.querySelector('input').value;
+    if(v.trim()===''){fb.hidden=false;fb.innerHTML='Type a number first.';return}
+    tries++;const ok=isRight({type:'num',answer:s.answer,tol:s.tol||2,abs_tol:s.abs_tol},v);fb.hidden=false;
+    const next=()=>{b.disabled=true;const nx=row.parentElement.querySelector(`.gstep[data-k="${k+1}"]`);if(nx){nx.hidden=false;nx.querySelector('input').focus()}else markDone()};
+    if(ok){fb.innerHTML=`<b class="r">Correct.</b> ${s.explain}`;next()}
+    else if(tries===1){fb.innerHTML=`<b class="w">Not yet.</b> Hint: ${s.hint}`}
+    else{fb.innerHTML=`<b class="w">Here's the working:</b> ${s.explain}`;next()}})});
+}
+
 /* ---------- router & events ---------- */
 function route(){const h=location.hash.replace('#','');const m=h.match(/^w(\d{1,2})$/);if(m&&+m[1]>=1&&+m[1]<=12)return{v:'week',n:+m[1]};if(h==='formulas')return{v:'formulas'};return{v:'home'}}
 let lastRoute='';
@@ -442,6 +664,7 @@ function bind(r){
 }
 function bindPane(w){
   const key='w'+w.n;
+  if(tab==='lesson'&&LESSONS[w.n]){bindLesson(w);return}
   document.querySelectorAll('[data-sess]').forEach(c=>c.addEventListener('change',()=>{const a=S.sessions[key]||[];a[+c.dataset.sess]=c.checked;S.sessions[key]=a;save();renderBar(w.n)}));
   document.querySelectorAll('[data-prac]').forEach(c=>c.addEventListener('change',()=>{const a=S.practice[key]||[];a[+c.dataset.prac]=c.checked;S.practice[key]=a;save()}));
   const ns=$('#nextstep');
@@ -470,8 +693,8 @@ function bindPane(w){
   const rt=$('#retake');
   if(rt) rt.addEventListener('click',()=>{delete marked[key];S.drafts[key]={};save();$('#pane').innerHTML=pane(w);bindPane(w)});
 }
-try{const t=sessionStorage.getItem('s12tab');if(t)tab=t}catch(e){}
-window.addEventListener('hashchange',()=>{tab='plan';render()});
+{let t=null;try{t=sessionStorage.getItem('s12tab')}catch(e){}const m=location.hash.match(/^#w(\d+)$/);tab=t||((m&&LESSONS[+m[1]])?'lesson':'plan')}
+window.addEventListener('hashchange',()=>{const m=location.hash.match(/^#w(\d+)$/);tab=(m&&LESSONS[+m[1]])?'lesson':'plan';render()});
 render();
 })();
 </script>
